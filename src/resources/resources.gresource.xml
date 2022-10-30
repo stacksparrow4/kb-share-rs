@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
-    <gresource prefix="/com/stacksparrw4/KBShareRS/">
-        <file compressed="true" preprocess="xml-stripblanks">main_menu.ui</file>
+    <gresource prefix="/com/stacksparrow4/KBShareRS/">
+        <file compressed="true" preprocess="xml-stripblanks">menu.ui</file>
     </gresource>
 </gresources>

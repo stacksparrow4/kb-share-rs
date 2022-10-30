@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-    <template class="MyGtkAppWindow" parent="GtkApplicationWindow">
+    <template class="MainMenu" parent="GtkApplicationWindow">
         <property name="title">KB Share</property>
         <child>
             <object class="GtkBox">
@@ -19,7 +19,7 @@
                 </child>
 
                 <child>
-                    <object class="GtkButton">
+                    <object class="GtkButton" id="start_server">
                         <property name="label">Start Server</property>
                     </object>
                 </child>

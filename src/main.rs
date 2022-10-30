@@ -2,15 +2,16 @@
 
 mod keyboard;
 mod keycodenames;
+mod menu;
 
 use gtk::gdk::Display;
-use gtk::glib::clone;
+use gtk::Entry;
 use gtk::{gio, Application, ApplicationWindow};
-use gtk::{glib, Entry};
 use gtk::{prelude::*, Box, Button, CssProvider, Label, StyleContext};
 
 use keyboard::presskeydown;
 use keycodenames::KEYCODE_NAMES;
+use menu::Menu;
 
 fn main() {
     gio::resources_register_include!("kb_share_rs.gresource").expect("Failed to include resources");
@@ -37,34 +38,15 @@ fn load_css() {
 }
 
 fn build_ui(app: &Application) {
-    let main_menu_label = Label::builder()
-        .label("KB Share")
-        .css_classes(vec!["header".to_string()])
-        .build();
+    let window = Menu::new(app);
 
-    let start_server_button = Button::builder().label("Start Server").build();
-    let start_client_button = Button::builder().label("Start Client").build();
+    // let server_window = build_server_window(app);
 
-    let window_box = Box::builder()
-        .orientation(gtk::Orientation::Vertical)
-        .build();
-    window_box.append(&main_menu_label);
-    window_box.append(&start_server_button);
-    window_box.append(&start_client_button);
-
-    let window = ApplicationWindow::builder()
-        .application(app)
-        .title("KB Share")
-        .child(&window_box)
-        .build();
-
-    let server_window = build_server_window(app);
-
-    start_server_button.connect_clicked(clone!(@weak window =>
-        move |_| {
-        server_window.present();
-        window.close();
-    }));
+    // start_server_button.connect_clicked(clone!(@weak window =>
+    //     move |_| {
+    //     server_window.present();
+    //     window.close();
+    // }));
 
     window.present();
 }
