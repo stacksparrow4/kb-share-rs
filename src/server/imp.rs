@@ -1,7 +1,8 @@
 use glib::subclass::InitializingObject;
-use gtk::prelude::*;
+use gtk::glib::clone;
 use gtk::subclass::prelude::*;
-use gtk::{glib, CompositeTemplate, Entry};
+use gtk::{glib, Button, CompositeTemplate, Entry, TextBuffer};
+use gtk::{prelude::*, TextView};
 
 use crate::keycodenames::KEYCODE_NAMES;
 
@@ -13,6 +14,10 @@ pub struct Server {
     pub client_binding_entry: TemplateChild<Entry>,
     #[template_child]
     pub server_binding_entry: TemplateChild<Entry>,
+    #[template_child]
+    pub binding_textview: TemplateChild<TextView>,
+    #[template_child]
+    pub add_binding_button: TemplateChild<Button>,
 }
 
 // The central trait for subclassing a GObject
@@ -53,10 +58,28 @@ impl ObjectImpl for Server {
     fn constructed(&self) {
         self.parent_constructed();
 
-        self.client_binding_entry
-            .set_completion(Some(&create_key_completion()));
-        self.server_binding_entry
-            .set_completion(Some(&create_key_completion()));
+        let binding_textview = self.binding_textview.clone();
+        let client_binding_entry = self.client_binding_entry.clone();
+        let server_binding_entry = self.server_binding_entry.clone();
+
+        client_binding_entry.set_completion(Some(&create_key_completion()));
+        server_binding_entry.set_completion(Some(&create_key_completion()));
+
+        self.add_binding_button.connect_clicked(clone!(@weak binding_textview, @weak client_binding_entry, @weak server_binding_entry => move |_| {
+            let buf = binding_textview.buffer();
+            let mut curr_text = String::from(buf.text(&buf.start_iter(), &buf.end_iter(), true));
+
+            if curr_text.len() > 0 {
+                curr_text.push_str("\n");
+            }
+            curr_text.push_str(client_binding_entry.text().as_str());
+            curr_text.push_str(" => ");
+            curr_text.push_str(server_binding_entry.text().as_str());
+            buf.set_text(curr_text.as_str());
+
+            client_binding_entry.set_text("");
+            server_binding_entry.set_text("");
+        }));
     }
 }
 
