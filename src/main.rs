@@ -3,6 +3,7 @@
 mod keyboard;
 mod keycodenames;
 mod menu;
+mod net_server;
 mod server;
 
 use gtk::gdk::Display;

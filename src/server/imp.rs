@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::thread;
 
 use glib::subclass::InitializingObject;
 use gtk::glib::clone;
@@ -7,6 +8,7 @@ use gtk::{glib, Button, CompositeTemplate, Entry};
 use gtk::{prelude::*, TextView};
 
 use crate::keycodenames::KEYCODE_NAMES;
+use crate::net_server::start_server_thread;
 
 // Object holding the state
 #[derive(CompositeTemplate, Default)]
@@ -126,6 +128,8 @@ impl ObjectImpl for Server {
                     mappings.insert(binding_client, binding_server);
                 }
 
+                let recv_err = start_server_thread(mappings);
+
                 btn.set_label("Server started!");
                 btn.set_sensitive(false);
                 add_binding_button.set_sensitive(false);
@@ -134,6 +138,13 @@ impl ObjectImpl for Server {
                 binding_textview.set_sensitive(false);
                 password_entry.set_sensitive(false);
                 port_entry.set_sensitive(false);
+
+                recv_err.attach(None, clone!(@weak btn => @default-return Continue(false),
+                    move |msg| {
+                        btn.add_css_class("error");
+                        btn.set_label(msg.as_str());
+                        Continue(true)
+                }));
             }));
     }
 }
