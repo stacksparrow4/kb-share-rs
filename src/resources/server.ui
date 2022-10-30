@@ -18,9 +18,7 @@
                 </child>
 
                 <child>
-                    <object class="GtkTextView" id="binding_textview">
-                        <!-- <property name="buffer">You currently have no bindings</property> -->
-                    </object>
+                    <object class="GtkTextView" id="binding_textview"></object>
                 </child>
 
                 <child>
@@ -50,6 +48,42 @@
                 <child>
                     <object class="GtkButton" id="add_binding_button">
                         <property name="label">Add Binding</property>
+                    </object>
+                </child>
+
+                <child>
+                    <object class="GtkBox">
+                        <child>
+                            <object class="GtkLabel">
+                                <property name="label">Server password:</property>
+                            </object>
+                        </child>
+
+                        <child>
+                            <object class="GtkEntry" id="password_entry"></object>
+                        </child>
+                    </object>
+                </child>
+
+                <child>
+                    <object class="GtkBox">
+                        <child>
+                            <object class="GtkLabel">
+                                <property name="label">Server port:</property>
+                            </object>
+                        </child>
+
+                        <child>
+                            <object class="GtkEntry" id="port_entry">
+                                <property name="text">1234</property>
+                            </object>
+                        </child>
+                    </object>
+                </child>
+
+                <child>
+                    <object class="GtkButton" id="start_server_button">
+                        <property name="label">Start Server</property>
                     </object>
                 </child>
             </object>

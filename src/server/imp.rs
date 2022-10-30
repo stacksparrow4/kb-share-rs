@@ -1,7 +1,7 @@
 use glib::subclass::InitializingObject;
 use gtk::glib::clone;
 use gtk::subclass::prelude::*;
-use gtk::{glib, Button, CompositeTemplate, Entry, TextBuffer};
+use gtk::{glib, Button, CompositeTemplate, Entry};
 use gtk::{prelude::*, TextView};
 
 use crate::keycodenames::KEYCODE_NAMES;
