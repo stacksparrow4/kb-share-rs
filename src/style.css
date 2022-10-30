@@ -1,0 +1,8 @@
+.header {
+    font-size: 40px;
+}
+
+button, entry, label {
+    margin: 5px;
+    font-size: 16px;
+}
