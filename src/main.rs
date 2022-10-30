@@ -1,13 +1,19 @@
+mod keyboard;
+mod keycodenames;
+
 use gtk::gdk::Display;
 use gtk::glib::clone;
 use gtk::{glib, Entry};
 use gtk::{prelude::*, Box, Button, CssProvider, Label, StyleContext};
 use gtk::{Application, ApplicationWindow};
 
-const APP_ID: &str = "com.stacksparrow4.KBShareRS";
+use keyboard::presskeydown;
+use keycodenames::KEYCODE_NAMES;
 
 fn main() {
-    let app = Application::builder().application_id(APP_ID).build();
+    let app = Application::builder()
+        .application_id("com.stacksparrow4.KBShareRS")
+        .build();
 
     app.connect_startup(|_| load_css());
     app.connect_activate(build_ui);
@@ -59,20 +65,71 @@ fn build_ui(app: &Application) {
     window.present();
 }
 
+fn create_key_entry() -> Entry {
+    let autocomplete = gtk::ListStore::new(&[String::static_type()]);
+
+    for entry in KEYCODE_NAMES.keys() {
+        autocomplete.set(&autocomplete.append(), &[(0, entry)]);
+    }
+
+    let key_completion = gtk::EntryCompletion::builder()
+        .popup_completion(true)
+        .model(&autocomplete)
+        .build();
+    key_completion.set_text_column(0);
+
+    Entry::builder().completion(&key_completion).build()
+}
+
 fn build_server_window(app: &Application) -> ApplicationWindow {
-    let port_label = Label::builder().label("Port for server").build();
-    let port_entry = Entry::builder().text("1234").build();
+    let current_bindings_label = Label::builder()
+        .label("You currently have no bindings")
+        .build();
 
-    let port_box = Box::builder().build();
-    port_box.append(&port_label);
-    port_box.append(&port_entry);
+    // Add binding
+    let add_binding_client_label = Label::builder().label("Client:").build();
+    let add_binding_client_key = create_key_entry();
+    let add_binding_server_label = Label::builder().label("Server:").build();
+    let add_binding_server_key = create_key_entry();
 
+    let add_binding_bar = Box::builder().build();
+    add_binding_bar.append(&add_binding_client_label);
+    add_binding_bar.append(&add_binding_client_key);
+    add_binding_bar.append(&add_binding_server_label);
+    add_binding_bar.append(&add_binding_server_key);
+
+    let add_binding_button = Button::builder().label("Add Binding").build();
+
+    // add_binding_button.connect_clicked(clone!(@weak current_bindings_label, @weak add_binding_client_key, @weak add_binding_server_key =>
+    //     move |_| {
+    //         let new_text = String::from("Your current bindings are:\n");
+    //         new_text
+    //     current_bindings_label.set_text(new_text);
+    // }));
+
+    // Password
+    let password_label = Label::builder().label("Password").build();
+    let password_entry = Entry::builder().text("password123").build();
+
+    let password_box = Box::builder().build();
+    password_box.append(&password_label);
+    password_box.append(&password_entry);
+
+    // Start
     let start_server = Button::builder().label("START").build();
 
+    start_server.connect_clicked(|_| {
+        presskeydown();
+    });
+
+    // Window
     let window_box = Box::builder()
         .orientation(gtk::Orientation::Vertical)
         .build();
-    window_box.append(&port_box);
+    window_box.append(&current_bindings_label);
+    window_box.append(&add_binding_bar);
+    window_box.append(&add_binding_button);
+    window_box.append(&password_box);
     window_box.append(&start_server);
 
     let window = ApplicationWindow::builder()
