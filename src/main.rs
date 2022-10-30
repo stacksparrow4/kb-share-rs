@@ -5,14 +5,16 @@ mod keycodenames;
 
 use gtk::gdk::Display;
 use gtk::glib::clone;
+use gtk::{gio, Application, ApplicationWindow};
 use gtk::{glib, Entry};
 use gtk::{prelude::*, Box, Button, CssProvider, Label, StyleContext};
-use gtk::{Application, ApplicationWindow};
 
 use keyboard::presskeydown;
 use keycodenames::KEYCODE_NAMES;
 
 fn main() {
+    gio::resources_register_include!("kb_share_rs.gresource").expect("Failed to include resources");
+
     let app = Application::builder()
         .application_id("com.stacksparrow4.KBShareRS")
         .build();

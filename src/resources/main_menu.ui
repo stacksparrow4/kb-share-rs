@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+    <template class="MyGtkAppWindow" parent="GtkApplicationWindow">
+        <property name="title">KB Share</property>
+        <child>
+            <object class="GtkBox">
+                <property name="orientation">vertical</property>
+                <property name="margin-top">12</property>
+                <property name="margin-bottom">12</property>
+                <property name="margin-start">12</property>
+                <property name="margin-end">12</property>
+                <property name="spacing">6</property>
+
+                <child>
+                    <object class="GtkLabel">
+                        <property name="css-classes">header</property>
+                        <property name="label">KB Share</property>
+                    </object>
+                </child>
+
+                <child>
+                    <object class="GtkButton">
+                        <property name="label">Start Server</property>
+                    </object>
+                </child>
+
+                <child>
+                    <object class="GtkButton">
+                        <property name="label">Start Client</property>
+                    </object>
+                </child>
+            </object>
+        </child>
+    </template>
+</interface>
