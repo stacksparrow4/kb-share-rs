@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use glib::subclass::InitializingObject;
 use gtk::glib::clone;
 use gtk::subclass::prelude::*;
@@ -18,6 +20,12 @@ pub struct Server {
     pub binding_textview: TemplateChild<TextView>,
     #[template_child]
     pub add_binding_button: TemplateChild<Button>,
+    #[template_child]
+    pub password_entry: TemplateChild<Entry>,
+    #[template_child]
+    pub port_entry: TemplateChild<Entry>,
+    #[template_child]
+    pub start_server_button: TemplateChild<Button>,
 }
 
 // The central trait for subclassing a GObject
@@ -61,11 +69,14 @@ impl ObjectImpl for Server {
         let binding_textview = self.binding_textview.clone();
         let client_binding_entry = self.client_binding_entry.clone();
         let server_binding_entry = self.server_binding_entry.clone();
+        let add_binding_button = self.add_binding_button.clone();
+        let password_entry = self.password_entry.clone();
+        let port_entry = self.port_entry.clone();
 
         client_binding_entry.set_completion(Some(&create_key_completion()));
         server_binding_entry.set_completion(Some(&create_key_completion()));
 
-        self.add_binding_button.connect_clicked(clone!(@weak binding_textview, @weak client_binding_entry, @weak server_binding_entry => move |_| {
+        add_binding_button.connect_clicked(clone!(@weak binding_textview, @weak client_binding_entry, @weak server_binding_entry => move |_| {
             let buf = binding_textview.buffer();
             let mut curr_text = String::from(buf.text(&buf.start_iter(), &buf.end_iter(), true));
 
@@ -80,6 +91,50 @@ impl ObjectImpl for Server {
             client_binding_entry.set_text("");
             server_binding_entry.set_text("");
         }));
+
+        self.start_server_button
+            .connect_clicked(clone!(@weak binding_textview, @weak client_binding_entry, @weak server_binding_entry, @weak add_binding_button, @weak password_entry, @weak port_entry => move |btn| {
+                let buf = binding_textview.buffer();
+                let curr_text = String::from(buf.text(&buf.start_iter(), &buf.end_iter(), true));
+
+                let mut mappings: HashMap<&str, &str> = HashMap::new();
+
+                for l in curr_text.lines() {
+                    if l.trim().len() == 0 {
+                        continue;
+                    }
+
+                    let parts: Vec<&str> = l.split("=>").collect();
+
+                    if parts.len() != 2 {
+                        btn.set_label("Invalid bindings syntax");
+                        return;
+                    }
+
+                    let binding_client = parts[0].trim();
+                    let binding_server = parts[1].trim();
+
+                    if !KEYCODE_NAMES.contains_key(binding_client) {
+                        btn.set_label(format!("Invalid binding {}", binding_client).as_str());
+                        return;
+                    }
+                    if !KEYCODE_NAMES.contains_key(binding_server) {
+                        btn.set_label(format!("Invalid binding {}", binding_server).as_str());
+                        return;
+                    }
+
+                    mappings.insert(binding_client, binding_server);
+                }
+
+                btn.set_label("Server started!");
+                btn.set_sensitive(false);
+                add_binding_button.set_sensitive(false);
+                server_binding_entry.set_sensitive(false);
+                client_binding_entry.set_sensitive(false);
+                binding_textview.set_sensitive(false);
+                password_entry.set_sensitive(false);
+                port_entry.set_sensitive(false);
+            }));
     }
 }
 
