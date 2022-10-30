@@ -1,7 +1,9 @@
 use glib::subclass::InitializingObject;
 use gtk::prelude::*;
 use gtk::subclass::prelude::*;
-use gtk::{glib, Button, CompositeTemplate};
+use gtk::{glib, Application, Button, CompositeTemplate};
+
+use crate::server::Server;
 
 // Object holding the state
 #[derive(CompositeTemplate, Default)]
@@ -32,6 +34,17 @@ impl ObjectSubclass for Menu {
 impl ObjectImpl for Menu {
     fn constructed(&self) {
         self.parent_constructed();
+    }
+}
+
+impl Menu {
+    pub fn create_windows(&self, app: &Application) {
+        let obj2 = self.obj().clone();
+        let app2 = app.clone();
+        self.start_server.connect_clicked(move |_| {
+            Server::new(&app2).present();
+            obj2.close();
+        });
     }
 }
 

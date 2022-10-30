@@ -2,5 +2,6 @@
 <gresources>
     <gresource prefix="/com/stacksparrow4/KBShareRS/">
         <file compressed="true" preprocess="xml-stripblanks">menu.ui</file>
+        <file compressed="true" preprocess="xml-stripblanks">server.ui</file>
     </gresource>
 </gresources>

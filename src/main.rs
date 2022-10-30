@@ -3,6 +3,9 @@
 mod keyboard;
 mod keycodenames;
 mod menu;
+mod server;
+
+use std::rc::Rc;
 
 use gtk::gdk::Display;
 use gtk::Entry;
@@ -39,14 +42,6 @@ fn load_css() {
 
 fn build_ui(app: &Application) {
     let window = Menu::new(app);
-
-    // let server_window = build_server_window(app);
-
-    // start_server_button.connect_clicked(clone!(@weak window =>
-    //     move |_| {
-    //     server_window.present();
-    //     window.close();
-    // }));
 
     window.present();
 }
