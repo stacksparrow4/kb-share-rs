@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::thread;
 
 use glib::subclass::InitializingObject;
 use gtk::glib::clone;
@@ -125,10 +124,17 @@ impl ObjectImpl for Server {
                         return;
                     }
 
-                    mappings.insert(binding_client, binding_server);
+                    mappings.insert(KEYCODE_NAMES.get_key(binding_client).unwrap(), KEYCODE_NAMES.get_key(binding_server).unwrap());
                 }
 
-                let recv_err = start_server_thread(mappings);
+                let port = u16::from_str_radix(port_entry.text().as_str(), 10);
+
+                if let Err(_) = port {
+                    btn.set_label("Invalid port");
+                    return;
+                }
+
+                let recv_err = start_server_thread(mappings, port.unwrap());
 
                 btn.set_label("Server started!");
                 btn.set_sensitive(false);
