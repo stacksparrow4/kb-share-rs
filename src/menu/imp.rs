@@ -3,6 +3,7 @@ use gtk::prelude::*;
 use gtk::subclass::prelude::*;
 use gtk::{glib, Application, Button, CompositeTemplate};
 
+use crate::client::Client;
 use crate::server::Server;
 
 // Object holding the state
@@ -11,6 +12,8 @@ use crate::server::Server;
 pub struct Menu {
     #[template_child]
     pub start_server: TemplateChild<Button>,
+    #[template_child]
+    pub start_client: TemplateChild<Button>,
 }
 
 // The central trait for subclassing a GObject
@@ -44,6 +47,13 @@ impl Menu {
         self.start_server.connect_clicked(move |_| {
             Server::new(&app2).present();
             obj2.close();
+        });
+
+        let obj3 = self.obj().clone();
+        let app3 = app.clone();
+        self.start_client.connect_clicked(move |_| {
+            Client::new(&app3).present();
+            obj3.close();
         });
     }
 }

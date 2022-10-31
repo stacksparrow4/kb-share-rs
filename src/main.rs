@@ -3,6 +3,7 @@
     windows_subsystem = "windows"
 )]
 
+mod client;
 mod keyboard;
 mod keycodenames;
 mod menu;

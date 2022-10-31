@@ -25,7 +25,7 @@
                 </child>
 
                 <child>
-                    <object class="GtkButton">
+                    <object class="GtkButton" id="start_client">
                         <property name="label">Start Client</property>
                     </object>
                 </child>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+    <template class="StartClient" parent="GtkApplicationWindow">
+        <property name="title">KB Share Client</property>
+        <child>
+            <object class="GtkBox">
+                <property name="orientation">vertical</property>
+                <property name="margin-top">12</property>
+                <property name="margin-bottom">12</property>
+                <property name="margin-start">12</property>
+                <property name="margin-end">12</property>
+                <property name="spacing">6</property>
+
+                <child>
+                    <object class="GtkLabel">
+                        <property name="label">Server Information:</property>
+                    </object>
+                </child>
+
+                <child>
+                    <object class="GtkBox">
+                        <child>
+                            <object class="GtkLabel">
+                                <property name="label">Server IP:</property>
+                            </object>
+                        </child>
+
+                        <child>
+                            <object class="GtkEntry" id="ip_entry"></object>
+                        </child>
+                    </object>
+                </child>
+
+                <child>
+                    <object class="GtkBox">
+                        <child>
+                            <object class="GtkLabel">
+                                <property name="label">Server port:</property>
+                            </object>
+                        </child>
+
+                        <child>
+                            <object class="GtkEntry" id="port_entry">
+                                <property name="text">1234</property>
+                            </object>
+                        </child>
+                    </object>
+                </child>
+
+                <child>
+                    <object class="GtkButton" id="connect_button">
+                        <property name="label">Connect</property>
+                    </object>
+                </child>
+            </object>
+        </child>
+    </template>
+</interface>
