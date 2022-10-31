@@ -17,7 +17,7 @@ fn client_logic(
     src_port: u16,
     display_msg: Sender<String>,
 ) -> io::Result<()> {
-    let mut src_addr = String::from("127.0.0.1:");
+    let mut src_addr = String::from("0.0.0.0:");
     src_addr.push_str(src_port.to_string().as_str());
 
     let sock = UdpSocket::bind(src_addr)?;

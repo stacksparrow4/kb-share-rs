@@ -90,8 +90,6 @@ fn server_logic(bindings: HashMap<&str, &str>, port: u16) -> io::Result<()> {
                             match key_states.get(&keycode) {
                                 Some(pressed) => {
                                     if *pressed != new_state {
-                                        println!("Setting state for {} to {}", keycode, new_state);
-
                                         if new_state {
                                             enigo.key_down(enigo::Key::Raw(keycode));
                                         } else {
