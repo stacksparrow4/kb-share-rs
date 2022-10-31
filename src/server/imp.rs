@@ -127,7 +127,7 @@ impl ObjectImpl for Server {
                     mappings.insert(KEYCODE_NAMES.get_key(binding_client).unwrap(), KEYCODE_NAMES.get_key(binding_server).unwrap());
                 }
 
-                let port = u16::from_str_radix(port_entry.text().as_str(), 10);
+                let port = u16::from_str_radix(&port_entry.text(), 10);
 
                 if let Err(_) = port {
                     btn.set_label("Invalid port");

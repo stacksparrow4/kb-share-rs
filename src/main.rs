@@ -7,6 +7,7 @@ mod client;
 mod keyboard;
 mod keycodenames;
 mod menu;
+mod net_client;
 mod net_server;
 mod server;
 

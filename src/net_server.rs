@@ -7,18 +7,42 @@ use std::{
 
 use gtk::glib::{MainContext, Receiver, PRIORITY_DEFAULT};
 
+use crate::keycodenames::KEYCODE_NAMES;
+
 fn server_logic(bindings: HashMap<&str, &str>, port: u16) -> io::Result<()> {
-    {
-        let sock = UdpSocket::bind(SocketAddr::from(([0, 0, 0, 0], port)))?;
+    let sock = UdpSocket::bind(SocketAddr::from(([0, 0, 0, 0], port)))?;
 
-        loop {
-            let mut buf = [0u8; 65507];
+    loop {
+        let mut buf = [0u8; 65507];
 
-            let res = sock.recv(&mut buf);
+        match sock.recv_from(&mut buf) {
+            Ok((size, from_addr)) => {
+                if size == 0 {
+                    println!("Ignoring 0 length packet");
+                    continue;
+                }
 
-            if let Ok(size) = res {
-                let msg = &buf[0..size];
-            } else {
+                let msg = &buf[..size];
+
+                if msg[0] == 1 {
+                    // Request bindings
+                    let mut resp = Vec::new();
+
+                    for client_key in bindings.keys() {
+                        let keycode = KEYCODE_NAMES.get(client_key).unwrap();
+
+                        let upper_byte = (keycode >> 8) as u8;
+                        let lower_byte = (keycode & 0xff) as u8;
+
+                        resp.push(upper_byte);
+                        resp.push(lower_byte);
+                    }
+
+                    sock.send_to(&resp, from_addr)
+                        .expect("Failed to send message back to client");
+                }
+            }
+            Err(_) => {
                 println!("Error: sock.recv failed");
             }
         }

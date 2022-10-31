@@ -12,8 +12,8 @@
                 <property name="spacing">6</property>
 
                 <child>
-                    <object class="GtkLabel">
-                        <property name="label">Server Information:</property>
+                    <object class="GtkLabel" id="connection_status">
+                        <property name="label">Not Connected</property>
                     </object>
                 </child>
 
@@ -42,6 +42,22 @@
                         <child>
                             <object class="GtkEntry" id="port_entry">
                                 <property name="text">1234</property>
+                            </object>
+                        </child>
+                    </object>
+                </child>
+
+                <child>
+                    <object class="GtkBox">
+                        <child>
+                            <object class="GtkLabel">
+                                <property name="label">Port to connect with:</property>
+                            </object>
+                        </child>
+
+                        <child>
+                            <object class="GtkEntry" id="src_port_entry">
+                                <property name="text">9001</property>
                             </object>
                         </child>
                     </object>
