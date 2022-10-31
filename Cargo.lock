@@ -463,7 +463,6 @@ dependencies = [
  "glib-build-tools",
  "gtk4",
  "phf",
- "winapi",
 ]
 
 [[package]]

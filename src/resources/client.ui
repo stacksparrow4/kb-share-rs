@@ -26,7 +26,9 @@
                         </child>
 
                         <child>
-                            <object class="GtkEntry" id="ip_entry"></object>
+                            <object class="GtkEntry" id="ip_entry">
+                                <property name="text">127.0.0.1</property>
+                            </object>
                         </child>
                     </object>
                 </child>

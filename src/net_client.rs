@@ -1,8 +1,7 @@
 use core::time;
-use std::{io, net::UdpSocket, thread};
+use std::{collections::HashMap, io, net::UdpSocket, sync::mpsc, thread};
 
 use gtk::glib::{MainContext, Receiver, Sender, PRIORITY_DEFAULT};
-use winapi::um::winuser::GetAsyncKeyState;
 
 use crate::{
     keycodenames::KEYCODE_NAMES,
@@ -11,11 +10,18 @@ use crate::{
 
 const SEND_RATE: u64 = 60;
 
+#[derive(Debug)]
+pub struct KeyPressMsg {
+    pub keycode: u16,
+    pub is_pressed: bool,
+}
+
 fn client_logic(
     dest_ip: String,
     dst_port: u16,
     src_port: u16,
     display_msg: Sender<String>,
+    read_key: mpsc::Receiver<KeyPressMsg>,
 ) -> io::Result<()> {
     let mut src_addr = String::from("0.0.0.0:");
     src_addr.push_str(src_port.to_string().as_str());
@@ -67,19 +73,33 @@ fn client_logic(
     let allowed_keys_str = format!("Allowed keys: {}", keycode_names.join(", "));
     display_msg.send(allowed_keys_str).unwrap();
 
+    let mut curr_states: HashMap<u16, bool> = HashMap::new();
+    for curr_keycode in allowed_keycodes {
+        curr_states.insert(curr_keycode, false);
+    }
+
     loop {
-        // Every tick, get state of all allowed_keycodes and send to server
+        // Event loop
+        loop {
+            match read_key.try_recv() {
+                Ok(msg) => {
+                    if curr_states.contains_key(&msg.keycode) {
+                        curr_states.insert(msg.keycode, msg.is_pressed);
+                    }
+                }
+                Err(_) => {
+                    break;
+                }
+            }
+        }
+
+        // Send state to server
         let mut packet: Vec<u8> = Vec::new();
         packet.push(2u8);
 
-        for &keycode in allowed_keycodes.iter() {
-            let state;
-            unsafe {
-                state = GetAsyncKeyState(keycode as i32);
-            }
-
-            packet.extend(&u16_to_bytes(keycode));
-            packet.push(if state == 0 { 0 } else { 1 });
+        for (keycode, pressed) in curr_states.iter() {
+            packet.extend(&u16_to_bytes(*keycode));
+            packet.push(if *pressed { 1 } else { 0 });
         }
 
         sock.send_to(&packet, dst_addr)?;
@@ -92,14 +112,19 @@ pub fn start_client_thread(
     dst_ip_str: &str,
     dst_port: u16,
     src_port: u16,
-) -> (Receiver<String>, Receiver<String>) {
+) -> (
+    Receiver<String>,
+    Receiver<String>,
+    mpsc::Sender<KeyPressMsg>,
+) {
     let (tx_err, rx_err) = MainContext::channel(PRIORITY_DEFAULT);
     let (tx_msg, rx_msg) = MainContext::channel(PRIORITY_DEFAULT);
+    let (tx_key, rx_key) = mpsc::channel();
 
     let dst_ip = String::from(dst_ip_str);
 
     thread::spawn(
-        move || match client_logic(dst_ip, dst_port, src_port, tx_msg) {
+        move || match client_logic(dst_ip, dst_port, src_port, tx_msg, rx_key) {
             Err(err) => {
                 tx_err.send(String::from(err.to_string())).unwrap();
             }
@@ -107,5 +132,5 @@ pub fn start_client_thread(
         },
     );
 
-    return (rx_err, rx_msg);
+    return (rx_err, rx_msg, tx_key);
 }
