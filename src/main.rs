@@ -10,6 +10,7 @@ mod menu;
 mod net_client;
 mod net_server;
 mod server;
+mod util;
 
 use gtk::gdk::Display;
 use gtk::{gio, Application};

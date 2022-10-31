@@ -7,7 +7,7 @@ use std::{
 
 use gtk::glib::{MainContext, Receiver, PRIORITY_DEFAULT};
 
-use crate::keycodenames::KEYCODE_NAMES;
+use crate::{keycodenames::KEYCODE_NAMES, util::u16_to_bytes};
 
 fn server_logic(bindings: HashMap<&str, &str>, port: u16) -> io::Result<()> {
     let sock = UdpSocket::bind(SocketAddr::from(([0, 0, 0, 0], port)))?;
@@ -24,22 +24,30 @@ fn server_logic(bindings: HashMap<&str, &str>, port: u16) -> io::Result<()> {
 
                 let msg = &buf[..size];
 
-                if msg[0] == 1 {
-                    // Request bindings
-                    let mut resp = Vec::new();
+                match msg[0] {
+                    1 => {
+                        // Request bindings
+                        let mut resp = Vec::new();
 
-                    for client_key in bindings.keys() {
-                        let keycode = KEYCODE_NAMES.get(client_key).unwrap();
+                        for client_key in bindings.keys() {
+                            let keycode = KEYCODE_NAMES.get(client_key).unwrap();
 
-                        let upper_byte = (keycode >> 8) as u8;
-                        let lower_byte = (keycode & 0xff) as u8;
+                            resp.extend(u16_to_bytes(*keycode));
+                        }
 
-                        resp.push(upper_byte);
-                        resp.push(lower_byte);
+                        sock.send_to(&resp, from_addr)
+                            .expect("Failed to send message back to client");
                     }
-
-                    sock.send_to(&resp, from_addr)
-                        .expect("Failed to send message back to client");
+                    2 => {
+                        // Set key states
+                        // Packet format:
+                        // [keycode_upper, keycode_lower, state]
+                        // where state = 0 = up
+                        // state = 1 = down
+                    }
+                    cmd => {
+                        println!("Unknown command: {}", cmd);
+                    }
                 }
             }
             Err(_) => {

@@ -2,7 +2,7 @@ use std::{io, net::UdpSocket, thread};
 
 use gtk::glib::{MainContext, Receiver, Sender, PRIORITY_DEFAULT};
 
-use crate::keycodenames::KEYCODE_NAMES;
+use crate::{keycodenames::KEYCODE_NAMES, util::bytes_to_u16};
 
 fn client_logic(
     dest_ip: String,
@@ -40,9 +40,7 @@ fn client_logic(
     let mut allowed_keycodes: Vec<u16> = Vec::new();
 
     for i in 0..(size / 2) {
-        let upper_byte = msg[2 * i] as u16;
-        let lower_byte = msg[2 * i + 1] as u16;
-        let original = (upper_byte << 8) | lower_byte;
+        let original = bytes_to_u16(&msg[(2 * i)..(2 * i + 2)]);
 
         if KEYCODE_NAMES.values().find(|&&x| x == original).is_none() {
             return Err(io::Error::new(
@@ -63,6 +61,9 @@ fn client_logic(
     display_msg.send(allowed_keys_str).unwrap();
 
     loop {
+        // TODO:
+        // Every tick, get state of all allowed_keycodes and send to server
+
         let mut buf = [0u8; 65507];
         let res = sock.recv(&mut buf);
 
