@@ -4,7 +4,6 @@
 )]
 
 mod client;
-mod keyboard;
 mod keycodenames;
 mod menu;
 mod net_client;

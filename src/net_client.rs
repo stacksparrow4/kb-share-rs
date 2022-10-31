@@ -1,8 +1,15 @@
+use core::time;
 use std::{io, net::UdpSocket, thread};
 
 use gtk::glib::{MainContext, Receiver, Sender, PRIORITY_DEFAULT};
+use winapi::um::winuser::GetAsyncKeyState;
 
-use crate::{keycodenames::KEYCODE_NAMES, util::bytes_to_u16};
+use crate::{
+    keycodenames::KEYCODE_NAMES,
+    util::{bytes_to_u16, u16_to_bytes},
+};
+
+const SEND_RATE: u64 = 60;
 
 fn client_logic(
     dest_ip: String,
@@ -61,17 +68,23 @@ fn client_logic(
     display_msg.send(allowed_keys_str).unwrap();
 
     loop {
-        // TODO:
         // Every tick, get state of all allowed_keycodes and send to server
+        let mut packet: Vec<u8> = Vec::new();
+        packet.push(2u8);
 
-        let mut buf = [0u8; 65507];
-        let res = sock.recv(&mut buf);
+        for &keycode in allowed_keycodes.iter() {
+            let state;
+            unsafe {
+                state = GetAsyncKeyState(keycode as i32);
+            }
 
-        if let Ok(size) = res {
-            let msg = &buf[0..size];
-        } else {
-            println!("Error: sock.recv failed");
+            packet.extend(&u16_to_bytes(keycode));
+            packet.push(if state == 0 { 0 } else { 1 });
         }
+
+        sock.send_to(&packet, dst_addr)?;
+
+        thread::sleep(time::Duration::from_millis(1000 / SEND_RATE));
     }
 }
 

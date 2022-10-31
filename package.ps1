@@ -4,6 +4,8 @@ if (Test-Path .\build) {
 
 mkdir build
 
+cargo build --release
+
 Copy-Item C:\gnome\bin\*.dll -Destination .\build\
 Copy-Item .\target\release\*.exe -Destination .\build\
 

@@ -7,8 +7,9 @@ edition = "2021"
 
 [dependencies]
 gtk = { version = "0.5.1", package = "gtk4" }
-enigo = "0.0.14"
+enigo = { path = "../deps/enigo", version = "0.0.14" }
 phf = { version = "0.11.1", features = ["macros"] }
+winapi = "0.3.9"
 
 [build-dependencies]
 glib-build-tools = "0.16.0"
