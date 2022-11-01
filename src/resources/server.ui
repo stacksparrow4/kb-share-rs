@@ -55,20 +55,6 @@
                     <object class="GtkBox">
                         <child>
                             <object class="GtkLabel">
-                                <property name="label">Server password:</property>
-                            </object>
-                        </child>
-
-                        <child>
-                            <object class="GtkEntry" id="password_entry"></object>
-                        </child>
-                    </object>
-                </child>
-
-                <child>
-                    <object class="GtkBox">
-                        <child>
-                            <object class="GtkLabel">
                                 <property name="label">Server port:</property>
                             </object>
                         </child>
@@ -78,6 +64,12 @@
                                 <property name="text">1234</property>
                             </object>
                         </child>
+                    </object>
+                </child>
+
+                <child>
+                    <object class="GtkLabel">
+                        <property name="label">Warning: This program is not secure. Only use on trusted networks.</property>
                     </object>
                 </child>
 

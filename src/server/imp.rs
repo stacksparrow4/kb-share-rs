@@ -22,8 +22,6 @@ pub struct Server {
     #[template_child]
     pub add_binding_button: TemplateChild<Button>,
     #[template_child]
-    pub password_entry: TemplateChild<Entry>,
-    #[template_child]
     pub port_entry: TemplateChild<Entry>,
     #[template_child]
     pub start_server_button: TemplateChild<Button>,
@@ -71,7 +69,6 @@ impl ObjectImpl for Server {
         let client_binding_entry = self.client_binding_entry.clone();
         let server_binding_entry = self.server_binding_entry.clone();
         let add_binding_button = self.add_binding_button.clone();
-        let password_entry = self.password_entry.clone();
         let port_entry = self.port_entry.clone();
 
         client_binding_entry.set_completion(Some(&create_key_completion()));
@@ -94,7 +91,7 @@ impl ObjectImpl for Server {
         }));
 
         self.start_server_button
-            .connect_clicked(clone!(@weak binding_textview, @weak client_binding_entry, @weak server_binding_entry, @weak add_binding_button, @weak password_entry, @weak port_entry => move |btn| {
+            .connect_clicked(clone!(@weak binding_textview, @weak client_binding_entry, @weak server_binding_entry, @weak add_binding_button, @weak port_entry => move |btn| {
                 let buf = binding_textview.buffer();
                 let curr_text = String::from(buf.text(&buf.start_iter(), &buf.end_iter(), true));
 
@@ -142,7 +139,6 @@ impl ObjectImpl for Server {
                 server_binding_entry.set_sensitive(false);
                 client_binding_entry.set_sensitive(false);
                 binding_textview.set_sensitive(false);
-                password_entry.set_sensitive(false);
                 port_entry.set_sensitive(false);
 
                 recv_err.attach(None, clone!(@weak btn => @default-return Continue(false),
